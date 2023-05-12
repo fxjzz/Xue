@@ -1,0 +1,17 @@
+{
+  "name": "xue",
+  "version": "1.0.0",
+  "description": "A framework for understanding the principles of Vue",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "vue",
+    "xue",
+    "framework"
+  ],
+  "author": "fxjzz",
+  "license": "MIT"
+}
+
