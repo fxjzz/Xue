@@ -28,7 +28,11 @@
     // 禁用 sourceMap
     "sourceMap": false,
     // https://www.typescriptlang.org/tsconfig#lib
-    "lib": ["esnext", "dom"]
+    "lib": ["esnext", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "@xue/*": ["packages/*/src"]
+    }
   },
   // 入口
   "include": ["packages/*/src"]
