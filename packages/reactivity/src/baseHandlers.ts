@@ -1,9 +1,11 @@
+import { track, trigger } from './effect'
+
 const get = createGetter()
 function createGetter() {
   return function get(target: object, key: string | symbol, receiver: object) {
     const res = Reflect.get(target, key, receiver)
 
-    track()
+    track(target, key)
 
     return res
   }
@@ -19,7 +21,7 @@ function createSetter() {
   ): boolean {
     const result = Reflect.set(target, key, value, receiver)
 
-    trigger()
+    trigger(target, key, value)
 
     return result
   }
