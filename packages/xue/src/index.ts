@@ -1,2 +1,1 @@
-const x = 'xxx'
-console.log(x)
+export { reactive } from '@xue/reactivity'
