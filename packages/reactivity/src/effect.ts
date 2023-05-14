@@ -1,6 +1,6 @@
-import { createDep } from './dep'
+import { Dep, createDep } from './dep'
 
-type KeyToDepMap = Map<any, ReactiveEffect>
+type KeyToDepMap = Map<any, Dep>
 const targetMap = new WeakMap<any, KeyToDepMap>()
 
 export let activeEffect: ReactiveEffect | undefined
@@ -27,20 +27,35 @@ export function track(target: object, key: unknown) {
     }
     let dep = depsMap.get(key)
     if (!dep) {
-      depsMap.set(key, activeEffect)
+      depsMap.set(key, (dep = createDep()))
+    }
+
+    const eventInfo = { effect: activeEffect, target, key }
+    trackEffects(dep, eventInfo)
+  }
+}
+export function trackEffects(dep: Dep, eventInfo?) {
+  dep.add(activeEffect!)
+}
+
+export function trigger(target: object, key: unknown, value: unknown) {
+  const depsMap = targetMap.get(target)
+
+  if (depsMap) {
+    let dep: Dep | undefined = depsMap.get(key)
+    if (dep) {
+      triggerEffects(dep)
     }
   }
 }
 
-export function trigger(target: object, key: unknown, value: unknown) {
-  console.log('触发依赖')
-  console.log(target, key, value)
-
-  const depsMap = targetMap.get(target)
-  if (depsMap) {
-    let effect = depsMap.get(key)
-    if (effect) {
-      effect.run()
-    }
+export function triggerEffects(dep: Dep) {
+  const effects = Array.isArray(dep) ? dep : [...dep]
+  for (const effect of effects) {
+    triggerEffect(effect)
   }
+}
+
+export function triggerEffect(effect: ReactiveEffect) {
+  effect.run()
 }
