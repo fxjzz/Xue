@@ -8,12 +8,16 @@
     <script src="../../dist/vue.js"></script>
   </head>
   <body>
+    <div id="app"></div>
     <script>
-      const { reactive } = Xue
-      const x = reactive({ name: '1' })
-
-      x.name
-      x.name = '2'
+      const { reactive, effect } = Xue
+      const x = reactive({ name: '2' })
+      effect(() => {
+        document.getElementById('app').innerHTML = x.name
+      })
+      setTimeout(() => {
+        x.name = '222'
+      }, 1000)
     </script>
   </body>
 </html>
