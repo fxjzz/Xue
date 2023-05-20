@@ -13,6 +13,7 @@
       const { computed, reactive, effect } = Xue
       const count = reactive({ name: 'xxx' })
       const computed1 = computed(() => {
+        console.log('computed')
         return count.name
       })
       effect(() => {
@@ -21,6 +22,9 @@
       setTimeout(() => {
         count.name = '123'
       }, 1000)
+      setTimeout(() => {
+        count.name = '123'
+      }, 2000)
     </script>
   </body>
 </html>

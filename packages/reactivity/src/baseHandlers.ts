@@ -1,3 +1,4 @@
+import { hasChange } from '@xue/shared'
 import { track, trigger } from './effect'
 
 const get = createGetter()
@@ -19,10 +20,11 @@ function createSetter() {
     value: unknown,
     receiver: object
   ): boolean {
+    let oldValue = target[key]
     const result = Reflect.set(target, key, value, receiver)
-
-    trigger(target, key, value)
-
+    if (hasChange(value, oldValue)) {
+      trigger(target, key, value)
+    }
     return result
   }
 }
