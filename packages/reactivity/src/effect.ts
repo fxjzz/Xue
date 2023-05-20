@@ -4,12 +4,17 @@ import { Dep, createDep } from './dep'
 type KeyToDepMap = Map<any, Dep>
 const targetMap = new WeakMap<any, KeyToDepMap>()
 
+export type EffectScheduler = (...args: any[]) => any
+
 export let activeEffect: ReactiveEffect | undefined
 
 export class ReactiveEffect<T = any> {
   computed?: ComputedRefImpl<T>
 
-  constructor(public fn: () => T) {}
+  constructor(
+    public fn: () => T,
+    public scheduler: EffectScheduler | null = null
+  ) {}
   run() {
     activeEffect = this
     return this.fn()
@@ -60,5 +65,9 @@ export function triggerEffects(dep: Dep) {
 }
 
 export function triggerEffect(effect: ReactiveEffect) {
-  effect.run()
+  if (effect.scheduler) {
+    effect.scheduler()
+  } else {
+    effect.run()
+  }
 }

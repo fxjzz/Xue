@@ -1,7 +1,7 @@
 import { isFunction } from '@xue/shared'
 import { Dep } from './dep'
 import { ReactiveEffect } from './effect'
-import { trackRefValue } from './ref'
+import { trackRefValue, triggerRefValue } from './ref'
 
 export class ComputedRefImpl<T> {
   public dep?: Dep = undefined
@@ -12,13 +12,21 @@ export class ComputedRefImpl<T> {
 
   public _dirty = true
   constructor(getter: any, private readonly _setter, isReadonly: boolean) {
-    this.effect = new ReactiveEffect(getter)
+    this.effect = new ReactiveEffect(getter, () => {
+      if (!this._dirty) {
+        this._dirty = true
+        triggerRefValue(this)
+      }
+    })
     this.effect.computed = this
   }
 
   get value() {
     trackRefValue(this)
-    this._value = this.effect.run() //getter函数run
+    if (this._dirty) {
+      this._dirty = false
+      this._value = this.effect.run() //getter函数run
+    }
     return this._value
   }
 
