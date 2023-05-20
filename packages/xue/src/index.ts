@@ -1,1 +1,1 @@
-export { reactive, effect } from '@xue/reactivity'
+export { reactive, effect, ref } from '@xue/reactivity'

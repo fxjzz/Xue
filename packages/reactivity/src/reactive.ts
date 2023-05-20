@@ -20,7 +20,7 @@ import { mutableHandlers } from './baseHandlers'
 export const reactiveMap = new WeakMap<object, any>()
 
 export const toReactive = <T extends unknown>(value: T): T =>
-  isObject(value) ? value : reactive(value as object)
+  isObject(value) ? reactive(value as object) : value
 
 export function reactive(target: object) {
   return createReactiveObject(target, mutableHandlers, reactiveMap)
