@@ -35,14 +35,14 @@ function deleteProperty() {
 function has() {
   return false
 }
-function ownKeys() {
-  return []
-}
+// function ownKeys(target) {
+//   return Reflect.ownKeys(target)
+// }
 
 export const mutableHandlers: ProxyHandler<object> = {
   get,
   set,
   deleteProperty,
-  has,
-  ownKeys
+  has
+  //ownKeys
 }

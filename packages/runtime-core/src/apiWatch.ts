@@ -66,14 +66,9 @@ export function traverse(value: unknown) {
   if (!isObject(value)) {
     return value
   }
-  console.log(value)
-
-  const arr = Object.getOwnPropertyNames(value as object)
-  console.log(arr)
-
-  arr.forEach(a => {
-    traverse((value as object)[a])
-  })
+  for (const key in value as object) {
+    traverse((value as object)[key])
+  }
 
   return value
 }
