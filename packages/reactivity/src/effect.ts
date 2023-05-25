@@ -1,3 +1,4 @@
+import { extend } from '@xue/shared'
 import { ComputedRefImpl, computed } from './computed'
 import { Dep, createDep } from './dep'
 
@@ -29,6 +30,9 @@ export class ReactiveEffect<T = any> {
 
 export function effect<T = any>(fn: () => T, options?: ReactiveEffectOptions) {
   const _effect = new ReactiveEffect(fn)
+  if (options) {
+    extend(_effect, options)
+  }
   if (!options || !options.lazy) {
     _effect.run()
   }
