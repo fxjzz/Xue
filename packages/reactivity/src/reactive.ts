@@ -1,13 +1,13 @@
 import { isObject } from '@xue/shared'
 import { mutableHandlers } from './baseHandlers'
 
-// export const enum ReactiveFlags {
-//   SKIP = '__v_skip',
-//   IS_REACTIVE = '__v_isReactive',
-//   IS_READONLY = '__v_isReadonly',
-//   IS_SHALLOW = '__v_isShallow',
-//   RAW = '__v_raw'
-// }
+export const enum ReactiveFlags {
+  SKIP = '__v_skip',
+  IS_REACTIVE = '__v_isReactive',
+  IS_READONLY = '__v_isReadonly',
+  IS_SHALLOW = '__v_isShallow',
+  RAW = '__v_raw'
+}
 
 // export interface Target {
 //   [ReactiveFlags.SKIP]?: boolean
@@ -36,6 +36,12 @@ function createReactiveObject(
     return existingProxy
   }
   const proxy = new Proxy(target, baseHandlers)
+  proxy[ReactiveFlags.IS_REACTIVE] = true
+
   proxyMap.set(target, proxy)
   return proxy
+}
+
+export const isReactive = (val: unknown): boolean => {
+  return !!(val && val[ReactiveFlags.IS_REACTIVE])
 }
