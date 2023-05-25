@@ -4,6 +4,11 @@ import { Dep, createDep } from './dep'
 type KeyToDepMap = Map<any, Dep>
 const targetMap = new WeakMap<any, KeyToDepMap>()
 
+export interface ReactiveEffectOptions {
+  lazy?: boolean
+  scheduler?: EffectScheduler
+}
+
 export type EffectScheduler = (...args: any[]) => any
 
 export let activeEffect: ReactiveEffect | undefined
@@ -22,9 +27,11 @@ export class ReactiveEffect<T = any> {
   stop() {}
 }
 
-export function effect<T = any>(fn: () => T) {
+export function effect<T = any>(fn: () => T, options?: ReactiveEffectOptions) {
   const _effect = new ReactiveEffect(fn)
-  _effect.run()
+  if (!options || !options.lazy) {
+    _effect.run()
+  }
 }
 
 export function track(target: object, key: unknown) {
