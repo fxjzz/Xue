@@ -10,8 +10,9 @@
   <body>
     <div id="app"></div>
     <script>
-      const { h } = Xue
-      const vnode = h('div', { class: 'test' }, 'hello')
+      const { render, h, Text } = Xue
+
+      const vnode = h('div', 'nihao')
       console.log(vnode)
     </script>
   </body>

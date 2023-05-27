@@ -1,4 +1,14 @@
-import { ShapeFlags, isArray, isFunction, isString } from '@xue/shared'
+import {
+  ShapeFlags,
+  isArray,
+  isFunction,
+  isObject,
+  isString
+} from '@xue/shared'
+
+export const Fragment = Symbol('fragment')
+export const Text = Symbol('text')
+export const Comment = Symbol('comment')
 
 export interface VNode {
   __v_isVNode: true
@@ -9,7 +19,11 @@ export interface VNode {
 }
 
 export function createVNode(type, props, children?): VNode {
-  const shapeFlag = isString(type) ? ShapeFlags.TEXT_CHILDREN : 0
+  const shapeFlag = isString(type)
+    ? ShapeFlags.TEXT_CHILDREN
+    : isObject(type)
+    ? ShapeFlags.STATEFUL_COMPONENT
+    : 0
   return createBaseVNode(type, props, children, shapeFlag)
 }
 
@@ -34,9 +48,10 @@ export function normalizeChildren(vnode: VNode, children: unknown) {
   let type = 0
 
   const { shapeFlag } = vnode
-  if (children === null) {
+  if (children == null) {
     children = null
   } else if (isArray(children)) {
+    type = ShapeFlags.ARRAY_CHILDREN
   } else if (typeof children === 'object') {
   } else if (isFunction(children)) {
   } else {
