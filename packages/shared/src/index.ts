@@ -1,3 +1,5 @@
+import { ShapeFlags } from './shapeFlags'
+
 export const isObject = (val: unknown) =>
   val !== null && typeof val === 'object'
 
@@ -10,3 +12,9 @@ export const isFunction = (val: unknown): val is Function =>
 export const extend = Object.assign
 
 export const EMPTY_OBJ: { readonly [key: string]: any } = {}
+
+export const isArray = Array.isArray
+
+export const isString = (val: unknown): val is string => typeof val === 'string'
+
+export { ShapeFlags }
