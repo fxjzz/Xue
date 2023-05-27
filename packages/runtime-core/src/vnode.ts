@@ -3,7 +3,8 @@ import {
   isArray,
   isFunction,
   isObject,
-  isString
+  isString,
+  normalizeClass
 } from '@xue/shared'
 
 export const Fragment = Symbol('fragment')
@@ -19,11 +20,19 @@ export interface VNode {
 }
 
 export function createVNode(type, props, children?): VNode {
+  if (props) {
+    let { class: klass, style } = props
+    if (klass && !isString(klass)) {
+      props.class = normalizeClass(klass)
+    }
+  }
+
   const shapeFlag = isString(type)
     ? ShapeFlags.TEXT_CHILDREN
     : isObject(type)
     ? ShapeFlags.STATEFUL_COMPONENT
     : 0
+
   return createBaseVNode(type, props, children, shapeFlag)
 }
 

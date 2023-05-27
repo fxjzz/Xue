@@ -12,7 +12,11 @@
     <script>
       const { render, h, Text } = Xue
 
-      const vnode = h('div', 'nihao')
+      const vnode = h('div', {
+        class: {
+          red: true
+        }
+      })
       console.log(vnode)
     </script>
   </body>
