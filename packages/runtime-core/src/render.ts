@@ -1,11 +1,12 @@
 import { EMPTY_OBJ, ShapeFlags } from '@xue/shared'
-import { Comment, Fragment, Text, VNode } from './vnode'
+import { Comment, Fragment, Text, VNode, isSameVNodeType } from './vnode'
 
 export interface RendererOptions {
   patchProp(el, key, prev, next): void
   insert(el, container, anchor): void
   createElement(tag): void
   setElementText(el, text): void
+  remove(el: Element): void
 }
 
 export function createRenderer(options: RendererOptions) {
@@ -17,7 +18,8 @@ function baseCreateRenderer(options: RendererOptions): any {
     insert: hostInsert,
     patchProp: hostPatchProp,
     createElement: hostCreateElement,
-    setElementText: hostSetElementText
+    setElementText: hostSetElementText,
+    remove: hostRemove
   } = options
 
   const processElement = (n1, n2, container, anchor) => {
@@ -139,6 +141,12 @@ function baseCreateRenderer(options: RendererOptions): any {
     if (n1 === n2) {
       return
     }
+
+    if (n1 && isSameVNodeType(n1, n2)) {
+      unmount(n1)
+      n1 = null
+    }
+
     const { type, shapeFlag } = n2
     switch (type) {
       case Text:
@@ -153,6 +161,10 @@ function baseCreateRenderer(options: RendererOptions): any {
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
         }
     }
+  }
+
+  const unmount = vnode => {
+    hostRemove(vnode.el)
   }
 
   const render = (vnode, container) => {

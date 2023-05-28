@@ -17,6 +17,7 @@ export interface VNode {
   props: any
   children: any
   shapeFlag: number
+  key: any
 }
 
 export function createVNode(type, props, children?): VNode {
@@ -46,7 +47,8 @@ function createBaseVNode(type, props, children, shapeFlag) {
     type,
     props,
     children,
-    shapeFlag
+    shapeFlag,
+    key: null
   }
 
   normalizeChildren(vnode, children)
@@ -70,4 +72,8 @@ export function normalizeChildren(vnode: VNode, children: unknown) {
 
   vnode.children = children
   vnode.shapeFlag |= type
+}
+
+export function isSameVNodeType(n1: VNode, n2: VNode) {
+  return n1.type === n2.type && n1.key === n2.key
 }
