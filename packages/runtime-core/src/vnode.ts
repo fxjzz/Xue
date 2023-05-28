@@ -28,7 +28,7 @@ export function createVNode(type, props, children?): VNode {
   }
 
   const shapeFlag = isString(type)
-    ? ShapeFlags.TEXT_CHILDREN
+    ? ShapeFlags.ELEMENT
     : isObject(type)
     ? ShapeFlags.STATEFUL_COMPONENT
     : 0
