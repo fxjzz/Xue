@@ -142,7 +142,7 @@ function baseCreateRenderer(options: RendererOptions): any {
       return
     }
 
-    if (n1 && isSameVNodeType(n1, n2)) {
+    if (n1 && !isSameVNodeType(n1, n2)) {
       unmount(n1)
       n1 = null
     }
@@ -169,6 +169,9 @@ function baseCreateRenderer(options: RendererOptions): any {
 
   const render = (vnode, container) => {
     if (vnode == null) {
+      if (container._vnode) {
+        unmount(container._vnode)
+      }
     } else {
       patch(container._vnode || null, vnode, container)
     }
