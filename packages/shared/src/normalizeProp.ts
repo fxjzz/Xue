@@ -1,4 +1,4 @@
-import { isArray, isObject, isString } from '.'
+import { isArray, isObject, isString } from './general'
 
 export function normalizeClass(value: unknown): string {
   let res = ''
