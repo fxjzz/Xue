@@ -4,7 +4,6 @@ import { Comment, Fragment, Text, VNode } from './vnode'
 export interface RendererOptions {
   patchProp(el, key, prev, next): void
   insert(el, container, anchor): void
-  remove(): void
   createElement(tag): void
   setElementText(el, text): void
 }
@@ -16,7 +15,6 @@ export function createRenderer(options: RendererOptions) {
 function baseCreateRenderer(options: RendererOptions): any {
   const {
     insert: hostInsert,
-    remove: hostRemove,
     patchProp: hostPatchProp,
     createElement: hostCreateElement,
     setElementText: hostSetElementText
