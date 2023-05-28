@@ -11,15 +11,25 @@
     <div id="app"></div>
     <script>
       const { render, h } = Xue
-      console.log(render)
       const vnode = h(
         'div',
         {
           class: 'nx'
         },
-        'nihao'
+        'niho'
       )
       render(vnode, document.getElementById('app'))
+
+      setTimeout(() => {
+        const vnode = h(
+          'div',
+          {
+            class: 'nxdd'
+          },
+          'niho123123'
+        )
+        render(vnode, document.getElementById('app'))
+      }, 2000)
     </script>
   </body>
 </html>
