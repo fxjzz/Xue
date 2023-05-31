@@ -1,5 +1,9 @@
 import { EMPTY_OBJ, ShapeFlags } from '@xue/shared'
 import { Comment, Fragment, Text, VNode, isSameVNodeType } from './vnode'
+import { createComponentInstance, setupComponent } from './component'
+import { ReactiveEffect } from '@xue/reactivity'
+import { queueJob } from './scheduler'
+import { renderComponentRoot } from './componentRenderUtils'
 
 export interface RendererOptions {
   patchProp(el, key, prev, next): void
@@ -30,6 +34,48 @@ function baseCreateRenderer(options: RendererOptions): any {
       //更新
       patchElement(n1, n2)
     }
+  }
+
+  const processComponent = (n1, n2, container, anchor) => {
+    if (n1 == null) {
+      mountComponent(n2, container, anchor)
+    } else {
+      //updateComponent()
+    }
+  }
+
+  const mountComponent = (initialVNode, container, anchor) => {
+    initialVNode.component = createComponentInstance(initialVNode)
+    const instance = initialVNode.component
+
+    setupComponent(instance)
+
+    setupRenderEffect(instance, initialVNode, container, anchor)
+  }
+
+  const setupRenderEffect = (instance, initialVNode, container, anchor) => {
+    const componentUpdateFn = () => {
+      if (!instance.isMounted) {
+        const subTree = (instance.sunTree = renderComponentRoot(instance))
+        console.log(subTree)
+
+        patch(null, subTree, container, anchor)
+
+        initialVNode.el = subTree.el
+      } else {
+      }
+    }
+
+    const effect = (instance.effect = new ReactiveEffect(
+      componentUpdateFn,
+      () => {
+        queueJob(update)
+      }
+    ))
+
+    const update = (instance.update = () => effect.run())
+
+    update()
   }
 
   const mountElement = (vnode, container, anchor) => {
@@ -159,6 +205,7 @@ function baseCreateRenderer(options: RendererOptions): any {
         if (shapeFlag & ShapeFlags.ELEMENT) {
           processElement(n1, n2, container, anchor)
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
+          processComponent(n1, n2, container, anchor)
         }
     }
   }

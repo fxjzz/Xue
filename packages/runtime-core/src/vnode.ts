@@ -20,6 +20,14 @@ export interface VNode {
   key: any
 }
 
+export function normalizeVNode(child) {
+  if (typeof child === 'object') {
+    return child
+  } else {
+    return createVNode(Text, null, String(child))
+  }
+}
+
 export function createVNode(type, props, children?): VNode {
   if (props) {
     let { class: klass, style } = props
