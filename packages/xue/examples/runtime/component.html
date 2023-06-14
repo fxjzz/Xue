@@ -18,6 +18,16 @@
       }
       const vnode = h(component)
       render(vnode, document.getElementById('app'))
+
+      setTimeout(()=>{
+        const com1 = {
+          render(){
+            return h('div','nihao')
+          }
+        }
+        const vnode1 = h(com1)
+        render(vnode1,document.getElementById('app'))
+      },1000)
     </script>
   </body>
 </html>
