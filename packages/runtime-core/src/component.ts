@@ -1,3 +1,6 @@
+import { reactive } from '@xue/reactivity'
+import { isObject } from '@xue/shared'
+
 let uid = 0
 
 export const createComponentInstance = vnode => {
@@ -28,4 +31,16 @@ export function finishComponentSetup(instance) {
   const Component = instance.type
 
   instance.render = Component.render
+  console.log('1', instance)
+  applyOptions(instance)
+}
+
+function applyOptions(instance: any) {
+  const { data: dataOptions } = instance.type
+  if (dataOptions) {
+    const data = dataOptions() //执行data函数拿到返回值
+    if (isObject(data)) {
+      instance.data = reactive(data)
+    }
+  }
 }
