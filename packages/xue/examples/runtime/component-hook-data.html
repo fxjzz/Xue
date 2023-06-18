@@ -17,11 +17,10 @@
             msg:'nihao'
           }
         },
-        beforeMount() {
-          console.log('beforeMount',this.msg);
-        },
         mounted() {
-          console.log('mounted');
+          setTimeout(()=>{
+            this.msg = 'xxxx'
+          },1000)
         },
         render() {
           return h('div', this.msg)

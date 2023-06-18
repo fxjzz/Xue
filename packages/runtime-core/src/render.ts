@@ -61,7 +61,7 @@ function baseCreateRenderer(options: RendererOptions): any {
         if (bm) {
           bm()
         }
-        const subTree = (instance.sunTree = renderComponentRoot(instance))
+        const subTree = (instance.subTree = renderComponentRoot(instance))
 
         patch(null, subTree, container, anchor)
 
@@ -73,6 +73,19 @@ function baseCreateRenderer(options: RendererOptions): any {
 
         instance.isMounted = true
       } else {
+        let { next, vnode } = instance
+        if (!next) {
+          next = vnode
+        }
+
+        const nextTree = renderComponentRoot(instance)
+        const prevTree = instance.subTree
+
+        instance.subTree = nextTree
+
+        patch(prevTree, nextTree, container, anchor)
+
+        next.el = nextTree.el
       }
     }
 
@@ -194,6 +207,8 @@ function baseCreateRenderer(options: RendererOptions): any {
   const patchKeyedChildren = (c1, c2, container, anchor) => {}
 
   const patch = (n1, n2: VNode, container, anchor = null) => {
+    console.log(n1, n2)
+
     if (n1 === n2) {
       return
     }
