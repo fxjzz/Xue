@@ -1,5 +1,6 @@
 import { reactive } from '@xue/reactivity'
 import { isObject } from '@xue/shared'
+import { onBeforeMount, onMounted } from './apiLifecycle'
 
 let uid = 0
 
@@ -13,7 +14,11 @@ export const createComponentInstance = vnode => {
     subTree: null,
     effect: null,
     update: null,
-    render: null
+    render: null,
+    isMounted: false,
+    c: null,
+    bm: null,
+    m: null
   }
 
   return instance
@@ -36,11 +41,27 @@ export function finishComponentSetup(instance) {
 }
 
 function applyOptions(instance: any) {
-  const { data: dataOptions } = instance.type
+  const { data: dataOptions, created, beforeMount, mounted } = instance.type
+
   if (dataOptions) {
     const data = dataOptions() //执行data函数拿到返回值
     if (isObject(data)) {
       instance.data = reactive(data)
     }
   }
+
+  if (created) {
+    callHook(created)
+  }
+
+  function registerLifecycleHook(register: Function, hook?: Function) {
+    register(hook, instance)
+  }
+
+  registerLifecycleHook(onBeforeMount, beforeMount)
+  registerLifecycleHook(onMounted, mounted)
+}
+
+function callHook(hook: Function) {
+  hook()
 }
