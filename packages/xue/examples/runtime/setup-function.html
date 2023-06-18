@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../../dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      const { render, h,ref } = Xue
+      const component = {
+        setup() {
+          const x = ref('1')
+          setTimeout(()=>{
+            x.value = '2'
+          },1000)
+          return ()=> h('div', x.value)
+        }
+      }
+      const vnode = h(component)
+      render(vnode, document.getElementById('app'))
+    </script>
+  </body>
+</html>

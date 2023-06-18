@@ -1,5 +1,5 @@
 import { reactive } from '@xue/reactivity'
-import { isObject } from '@xue/shared'
+import { isFunction, isObject } from '@xue/shared'
 import { onBeforeMount, onMounted } from './apiLifecycle'
 
 let uid = 0
@@ -29,14 +29,35 @@ export function setupComponent(instance) {
 }
 
 function setupStatefulComponent(instance) {
-  return finishComponentSetup(instance)
+  const Component = instance.type
+  const { setup } = Component
+
+  if (setup) {
+    const setupResult = setup()
+    handleSetupResult(instance, setupResult)
+  } else {
+    finishComponentSetup(instance)
+  }
+}
+
+export function handleSetupResult(instance, setupResult) {
+  if (isFunction(setupResult)) {
+    // ()=>h()
+    instance.render = setupResult
+  } else if (isObject(setupResult)) {
+    // { x }
+  }
+
+  finishComponentSetup(instance)
 }
 
 export function finishComponentSetup(instance) {
   const Component = instance.type
 
-  instance.render = Component.render
-  console.log('1', instance)
+  if (!instance.render) {
+    instance.render = Component.render
+  }
+
   applyOptions(instance)
 }
 
