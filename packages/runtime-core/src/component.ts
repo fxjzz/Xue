@@ -51,17 +51,17 @@ function applyOptions(instance: any) {
   }
 
   if (created) {
-    callHook(created)
+    callHook(created, instance.data)
   }
 
   function registerLifecycleHook(register: Function, hook?: Function) {
-    register(hook, instance)
+    register(hook?.bind(instance.data), instance)
   }
 
   registerLifecycleHook(onBeforeMount, beforeMount)
   registerLifecycleHook(onMounted, mounted)
 }
 
-function callHook(hook: Function) {
-  hook()
+function callHook(hook: Function, proxy) {
+  hook.call(proxy)
 }
