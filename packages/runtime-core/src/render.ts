@@ -1,5 +1,12 @@
-import { EMPTY_OBJ, ShapeFlags } from '@xue/shared'
-import { Comment, Fragment, Text, VNode, isSameVNodeType } from './vnode'
+import { EMPTY_OBJ, ShapeFlags, isString } from '@xue/shared'
+import {
+  Comment,
+  Fragment,
+  Text,
+  VNode,
+  isSameVNodeType,
+  normalizeVNode
+} from './vnode'
 import { createComponentInstance, setupComponent } from './component'
 import { ReactiveEffect } from '@xue/reactivity'
 import { queueJob } from './scheduler'
@@ -106,9 +113,10 @@ function baseCreateRenderer(options: RendererOptions): any {
     const { type, props, shapeFlag } = vnode
     el = vnode.el = hostCreateElement(type)
 
-    if (shapeFlag & ShapeFlags.ELEMENT) {
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
       hostSetElementText(el, vnode.children)
     } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+      mountChildren(vnode.children, el, anchor)
     }
 
     if (props) {
@@ -118,6 +126,17 @@ function baseCreateRenderer(options: RendererOptions): any {
     }
 
     hostInsert(el, container, anchor)
+  }
+
+  const mountChildren = (children, container, anchor) => {
+    if (isString(children)) {
+      children = children.split('')
+    }
+
+    for (let i = 0; i < children.length; i++) {
+      const child = (children[i] = normalizeVNode(children[i]))
+      patch(null, child, container, anchor)
+    }
   }
 
   const patchElement = (n1, n2) => {
@@ -204,7 +223,24 @@ function baseCreateRenderer(options: RendererOptions): any {
     }
   }
 
-  const patchKeyedChildren = (c1, c2, container, anchor) => {}
+  const patchKeyedChildren = (c1, c2, container, anchor) => {
+    let i = 0
+    const l2 = c2.length
+    let e1 = c1.length - 1 //old node last下标
+    let e2 = l2 - 1 //new node last下标
+
+    // 1. 从头比对
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[i]
+      const n2 = normalizeVNode(c2[i])
+      if (isSameVNodeType(n1, n2)) {
+        patch(n1, n2, container, anchor)
+      } else {
+        break
+      }
+      i++
+    }
+  }
 
   const patch = (n1, n2: VNode, container, anchor = null) => {
     console.log(n1, n2)
