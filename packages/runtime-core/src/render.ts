@@ -223,7 +223,7 @@ function baseCreateRenderer(options: RendererOptions): any {
     }
   }
 
-  const patchKeyedChildren = (c1, c2, container, anchor) => {
+  const patchKeyedChildren = (c1, c2, container, parentAnchor) => {
     let i = 0
     const l2 = c2.length
     let e1 = c1.length - 1 //old node last下标
@@ -234,7 +234,7 @@ function baseCreateRenderer(options: RendererOptions): any {
       const n1 = c1[i]
       const n2 = (c2[i] = normalizeVNode(c2[i]))
       if (isSameVNodeType(n1, n2)) {
-        patch(n1, n2, container, anchor)
+        patch(n1, n2, container, parentAnchor)
       } else {
         break
       }
@@ -246,18 +246,30 @@ function baseCreateRenderer(options: RendererOptions): any {
       const n1 = c1[e1]
       const n2 = (c2[e2] = normalizeVNode(c2[e2]))
       if (isSameVNodeType(n1, n2)) {
-        patch(n1, n2, container, anchor)
+        patch(n1, n2, container, parentAnchor)
       } else {
         break
       }
       e1--
       e2--
     }
+
+    // 3. mount
+    // (a b)
+    // (a b) b
+    if (i > e1) {
+      if (i <= e2) {
+        const nextPos = e2 + 1
+        const anchor = nextPos < l2 ? c2[nextPos].el : parentAnchor
+        while (i <= e2) {
+          patch(null, normalizeVNode(c2[i]), container, anchor)
+          i++
+        }
+      }
+    }
   }
 
   const patch = (n1, n2: VNode, container, anchor = null) => {
-    console.log(n1, n2)
-
     if (n1 === n2) {
       return
     }
