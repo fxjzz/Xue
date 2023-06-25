@@ -277,6 +277,8 @@ function baseCreateRenderer(options: RendererOptions): any {
         i++
       }
     }
+
+    // 5. unknown sequence
   }
 
   const patch = (n1, n2: VNode, container, anchor = null) => {
