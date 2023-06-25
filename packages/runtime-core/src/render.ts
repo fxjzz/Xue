@@ -232,13 +232,26 @@ function baseCreateRenderer(options: RendererOptions): any {
     // 1. 从头比对
     while (i <= e1 && i <= e2) {
       const n1 = c1[i]
-      const n2 = normalizeVNode(c2[i])
+      const n2 = (c2[i] = normalizeVNode(c2[i]))
       if (isSameVNodeType(n1, n2)) {
         patch(n1, n2, container, anchor)
       } else {
         break
       }
       i++
+    }
+
+    // 2. 尾
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[e1]
+      const n2 = (c2[e2] = normalizeVNode(c2[e2]))
+      if (isSameVNodeType(n1, n2)) {
+        patch(n1, n2, container, anchor)
+      } else {
+        break
+      }
+      e1--
+      e2--
     }
   }
 
