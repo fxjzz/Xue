@@ -267,6 +267,16 @@ function baseCreateRenderer(options: RendererOptions): any {
         }
       }
     }
+
+    // 4. unmount
+    // (a b) c
+    // (a b)
+    else if (i > e2) {
+      while (i <= e1) {
+        unmount(c1[i])
+        i++
+      }
+    }
   }
 
   const patch = (n1, n2: VNode, container, anchor = null) => {
