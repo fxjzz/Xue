@@ -294,6 +294,8 @@ function baseCreateRenderer(options: RendererOptions): any {
 
       // 5.2 遍历旧节点
       // unmount不存在的，创建一个数组表示新节点在旧节点中的位置
+      let j
+
       let patched = 0
 
       let moved = false
@@ -324,6 +326,30 @@ function baseCreateRenderer(options: RendererOptions): any {
 
           patch(prevChild, c2[newIndex], container, null)
           patched++
+        }
+      }
+
+      // 5.3 move and mount
+      const increasingNewIndexSequence = moved
+        ? getSequence(newIndexToOldIndexMap)
+        : []
+
+      j = increasingNewIndexSequence.length - 1
+      //遍历新节点
+      for (i = toBePatched - 1; i >= 0; i--) {
+        const newIndex = s2 + i
+        const newChild = c2[newIndex]
+        const anchor = newIndex + 1 < l2 ? e2[newIndex + 1].el : parentAnchor
+
+        if (newIndexToOldIndexMap[i] === 0) {
+          //新节点挂载
+          patch(null, newChild, container, anchor)
+        } else if (moved) {
+          if (j < 0 || i !== increasingNewIndexSequence[j]) {
+            //moved()
+          } else {
+            j--
+          }
         }
       }
     }
@@ -375,4 +401,9 @@ function baseCreateRenderer(options: RendererOptions): any {
   return {
     render
   }
+}
+
+//最长递增子序列
+function getSequence(arr: number[]): number[] {
+  return [1]
 }
