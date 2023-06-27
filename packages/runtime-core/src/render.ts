@@ -279,6 +279,54 @@ function baseCreateRenderer(options: RendererOptions): any {
     }
 
     // 5. unknown sequence
+    else {
+      const s1 = i
+      const s2 = i
+
+      // 5.1 创建 key:index map
+      const keyToNewIndexMap = new Map()
+      for (i = s2; i <= e2; i++) {
+        const nextChild = (c2[i] = normalizeVNode(c2[i]))
+        if (nextChild.key != null) {
+          keyToNewIndexMap.set(nextChild.key, i)
+        }
+      }
+
+      // 5.2 遍历旧节点
+      // unmount不存在的，创建一个数组表示新节点在旧节点中的位置
+      let patched = 0
+
+      let moved = false
+      let maxNewIndexSoFar = 0
+
+      const toBePatched = e2 - s2 + 1
+
+      const newIndexToOldIndexMap = new Array(toBePatched).fill(0)
+
+      for (i = s1; i <= e1; i++) {
+        const prevChild = c1[i]
+        if (patched >= toBePatched) {
+          unmount(prevChild)
+          continue
+        }
+
+        let newIndex
+        newIndex = keyToNewIndexMap.get(prevChild.key)
+        if (newIndex === undefined) {
+          unmount(prevChild)
+        } else {
+          newIndexToOldIndexMap[newIndex - s2] = i + 1
+          if (newIndex < maxNewIndexSoFar) {
+            moved = true
+          } else {
+            maxNewIndexSoFar = newIndex
+          }
+
+          patch(prevChild, c2[newIndex], container, null)
+          patched++
+        }
+      }
+    }
   }
 
   const patch = (n1, n2: VNode, container, anchor = null) => {
