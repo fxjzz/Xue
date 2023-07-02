@@ -28,7 +28,8 @@ function createParserContext(content: string): ParserContext {
 
 export function baseParse(content: string, options) {
   const context = createParserContext(content)
-  parseChildren(context, TextModes.DATA, [])
+  const children = parseChildren(context, TextModes.DATA, [])
+  console.log(children)
 
   return {}
 }
@@ -65,13 +66,55 @@ function parseChildren(context: ParserContext, mode: TextModes, ancestors) {
       pushNode(nodes, node)
     }
   }
+
+  return nodes
 }
 
-function parseElement(context: ParserContext, ancestors) {
+function parseElement(context: ParserContext, ancestors: Array<any>) {
   const element = parseTag(context, TagType.Start)
+
+  ancestors.push(element)
+  const children = parseChildren(context, TextModes.DATA, ancestors)
+  ancestors.pop()
+
+  element.children = children
+
+  if (startsWithEndTagOpen(context.source, element.tag)) {
+    parseTag(context, TagType.End)
+  }
+
+  return element
 }
 
-function parseText(context: ParserContext, mode) {}
+function parseText(context: ParserContext, mode: TextModes) {
+  const endTokens = ['<', '{{']
+
+  let endIndex = context.source.length
+  for (let i = 0; i < endTokens.length; i++) {
+    const index = context.source.indexOf(endTokens[i], 1)
+    if (index !== -1 && endIndex > index) {
+      endIndex = index
+    }
+  }
+
+  const content = parseTextData(context, endIndex, mode)
+
+  return {
+    type: NodeTypes.TEXT,
+    content
+  }
+}
+
+function parseTextData(
+  context: ParserContext,
+  length: number,
+  mode: TextModes
+) {
+  const rawText = context.source.slice(0, length)
+  advanceBy(context, length)
+
+  return rawText
+}
 
 function parseTag(context: ParserContext, type: TagType) {
   const match = /^<\/?([a-z][^\t\r\n\f />]*)/i.exec(context.source)!
@@ -88,10 +131,6 @@ function parseTag(context: ParserContext, type: TagType) {
     console.log('err')
   }
   advanceBy(context, isSelfClosing ? 2 : 1)
-
-  if (type === TagType.End) {
-    return
-  }
 
   return {
     type: NodeTypes.ELEMENT,
