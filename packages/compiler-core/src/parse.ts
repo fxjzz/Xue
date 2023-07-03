@@ -125,7 +125,8 @@ function parseTag(context: ParserContext, type: TagType) {
   advanceSpaces(context)
 
   //attrs
-  //let props = parseAttributes(context, type)
+  let props = parseAttributes(context, type)
+  console.log('props', props)
 
   //Tag close
   let isSelfClosing = false
@@ -145,7 +146,7 @@ function parseTag(context: ParserContext, type: TagType) {
 }
 
 function parseAttributes(context: ParserContext, type: TagType) {
-  const props = []
+  const props: Array<any> = []
   const attributeNames = new Set<string>()
 
   while (
@@ -154,7 +155,9 @@ function parseAttributes(context: ParserContext, type: TagType) {
     !startsWith(context.source, '/>')
   ) {
     const attr = parseAttribute(context, attributeNames)
+    props.push(attr)
   }
+  return props
 }
 
 function parseAttribute(context: ParserContext, nameSet: Set<string>) {
@@ -171,16 +174,45 @@ function parseAttribute(context: ParserContext, nameSet: Set<string>) {
   advanceBy(context, name.length)
 
   //value ,  ' ="123"</div> '
-  let value = undefined
+  let value
   if (/^[\t\r\n\f ]*=/.test(context.source)) {
     advanceSpaces(context)
     advanceBy(context, 1) //"123"
     advanceSpaces(context)
-    //value = parseAttributeValue(context)
+    value = parseAttributeValue(context)
+  }
+
+  return {
+    type: NodeTypes.ATTRIBUTE,
+    name,
+    value: value && {
+      type: NodeTypes.TEXT,
+      content: value.content
+    }
   }
 }
 
-function parseAttributeValue(context: ParserContext) {}
+function parseAttributeValue(context: ParserContext) {
+  let content: string
+
+  const quote = context.source[0]
+  const isQuoted = quote === '"' || quote === `'`
+
+  if (isQuoted) {
+    advanceBy(context, 1)
+    const endIndex = context.source.indexOf(quote)
+    content = parseTextData(context, endIndex, TextModes.ATTRIBUTE_VALUE)
+    advanceBy(context, 1)
+  } else {
+    //todo
+    content = '1'
+  }
+
+  return {
+    content,
+    isQuoted
+  }
+}
 
 function isEnd(context: ParserContext, mode: TextModes, ancestors) {
   const s = context.source
