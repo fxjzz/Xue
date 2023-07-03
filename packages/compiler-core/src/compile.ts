@@ -5,6 +5,7 @@ export function baseCompile(template: string, options) {
   //
   //
   const ast = isString(template) ? baseParse(template, options) : template
+  console.log('ast', ast)
 
   return
 }

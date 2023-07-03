@@ -179,6 +179,7 @@ function parseAttribute(context: ParserContext, nameSet: Set<string>) {
     advanceBy(context, 1) //"123"
     advanceSpaces(context)
     value = parseAttributeValue(context)
+    console.log(value)
   }
 
   return {
@@ -202,6 +203,7 @@ function parseAttributeValue(context: ParserContext) {
     const endIndex = context.source.indexOf(quote)
     content = parseTextData(context, endIndex, TextModes.ATTRIBUTE_VALUE)
     advanceBy(context, 1)
+    advanceSpaces(context)
   } else {
     //todo
     content = '1'
