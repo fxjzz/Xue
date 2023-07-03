@@ -1,5 +1,5 @@
 import { isArray } from '@xue/shared'
-import { ElementTypes, NodeTypes } from './ast'
+import { ElementTypes, NodeTypes, createRoot } from './ast'
 
 export const enum TextModes {
   DATA,
@@ -29,9 +29,8 @@ function createParserContext(content: string): ParserContext {
 export function baseParse(content: string, options) {
   const context = createParserContext(content)
   const children = parseChildren(context, TextModes.DATA, [])
-  console.log(children)
 
-  return {}
+  return createRoot(children)
 }
 
 function parseChildren(context: ParserContext, mode: TextModes, ancestors) {

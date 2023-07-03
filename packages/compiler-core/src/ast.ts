@@ -38,3 +38,19 @@ export const enum ElementTypes {
   SLOT,
   TEMPLATE
 }
+
+export function createRoot(children) {
+  return {
+    type: NodeTypes.ROOT,
+    children,
+    helpers: new Set(),
+    components: [],
+    directives: [],
+    hoists: [],
+    imports: [],
+    cached: 0,
+    temps: 0,
+    codegenNode: undefined
+    //loc
+  }
+}
