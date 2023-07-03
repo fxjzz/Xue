@@ -126,7 +126,6 @@ function parseTag(context: ParserContext, type: TagType) {
 
   //attrs
   let props = parseAttributes(context, type)
-  console.log('props', props)
 
   //Tag close
   let isSelfClosing = false
@@ -141,7 +140,7 @@ function parseTag(context: ParserContext, type: TagType) {
     tag,
     children: [],
     tagType: ElementTypes.ELEMENT,
-    props: []
+    props
   }
 }
 
