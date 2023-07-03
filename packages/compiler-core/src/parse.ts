@@ -116,12 +116,16 @@ function parseTextData(
 }
 
 function parseTag(context: ParserContext, type: TagType) {
+  //Tag open
   const match = /^<\/?([a-z][^\t\r\n\f />]*)/i.exec(context.source)!
 
   const tag = match[1]
 
   advanceBy(context, match[0].length)
-  //advanceSpaces(context)
+  advanceSpaces(context)
+
+  //attrs
+  //let props = parseAttributes(context, type)
 
   //Tag close
   let isSelfClosing = false
@@ -139,6 +143,44 @@ function parseTag(context: ParserContext, type: TagType) {
     props: []
   }
 }
+
+function parseAttributes(context: ParserContext, type: TagType) {
+  const props = []
+  const attributeNames = new Set<string>()
+
+  while (
+    context.source.length > 0 &&
+    !startsWith(context.source, '>') &&
+    !startsWith(context.source, '/>')
+  ) {
+    const attr = parseAttribute(context, attributeNames)
+  }
+}
+
+function parseAttribute(context: ParserContext, nameSet: Set<string>) {
+  const match = /^[^\t\r\n\f />][^\t\r\n\f />=]*/.exec(context.source)!
+  const name = match[0]
+
+  if (nameSet.has(name)) {
+    throw new Error('props has same name')
+  }
+  nameSet.add(name)
+
+  //todo:边缘情况
+
+  advanceBy(context, name.length)
+
+  //value ,  ' ="123"</div> '
+  let value = undefined
+  if (/^[\t\r\n\f ]*=/.test(context.source)) {
+    advanceSpaces(context)
+    advanceBy(context, 1) //"123"
+    advanceSpaces(context)
+    //value = parseAttributeValue(context)
+  }
+}
+
+function parseAttributeValue(context: ParserContext) {}
 
 function isEnd(context: ParserContext, mode: TextModes, ancestors) {
   const s = context.source
