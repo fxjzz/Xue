@@ -1,4 +1,6 @@
 import { isArray, isString } from '@xue/shared'
+import { NodeTypes } from './ast'
+import { isSingleElementRoot } from './hoistStatic'
 
 export function createTransformContext(
   root,
@@ -29,6 +31,16 @@ export function transform(root, options) {
   const context = createTransformContext(root, options)
 
   traverseNode(root, context)
+
+  createRootCodegen(root, context)
+  root.helpers = new Set([...context.helpers.keys()])
+  root.components = []
+  root.directives = []
+  root.imports = []
+  root.hoists = []
+  root.temps = []
+  root.cached = []
+  console.log(JSON.stringify(root))
 }
 
 export function traverseNode(node, context) {
@@ -55,7 +67,12 @@ export function traverseNode(node, context) {
   }
 
   //深度遍历所有child
-  traverseChildren(node, context)
+  switch (node.type) {
+    case NodeTypes.ELEMENT:
+    case NodeTypes.ROOT:
+      traverseChildren(node, context)
+      break
+  }
 
   context.currentNode = node
   //执行回调函数
@@ -75,5 +92,17 @@ export function traverseChildren(parent, context) {
     context.parent = parent
     context.childIndex = i
     traverseNode(child, context)
+  }
+}
+
+function createRootCodegen(root, context) {
+  const { children } = root
+  if (children.length === 1) {
+    const child = children[0]
+    if (isSingleElementRoot(root, child) && child.codegenNode) {
+      const codegenNode = child.codegenNode
+
+      root.codegenNode = codegenNode
+    }
   }
 }

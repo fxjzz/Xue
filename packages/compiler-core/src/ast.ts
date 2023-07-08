@@ -70,3 +70,11 @@ export function createVNodeCall(context, tag, props, children) {
     children
   }
 }
+
+export function createCompoundExpression(children, loc) {
+  return {
+    type: NodeTypes.COMPOUND_EXPRESSION,
+    loc,
+    children
+  }
+}
