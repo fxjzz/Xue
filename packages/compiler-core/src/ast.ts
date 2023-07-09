@@ -78,3 +78,34 @@ export function createCompoundExpression(children, loc) {
     children
   }
 }
+
+export function createStringLiteral(value) {
+  return {
+    type: 'StringLiteral',
+    value
+  }
+}
+
+export function createIdentifier(name) {
+  return {
+    type: 'Identifier',
+    name
+  }
+}
+
+export function createCallExpress(callee, args) {
+  console.log(args)
+
+  return {
+    type: 'CallExpression',
+    callee: createIdentifier(callee),
+    args
+  }
+}
+
+export function createArrayExpression(elements) {
+  return {
+    type: 'ArrayExpression',
+    elements
+  }
+}

@@ -40,7 +40,6 @@ export function transform(root, options) {
   root.hoists = []
   root.temps = []
   root.cached = []
-  console.log(JSON.stringify(root))
 }
 
 export function traverseNode(node, context) {
