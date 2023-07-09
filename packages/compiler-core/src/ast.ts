@@ -52,8 +52,9 @@ export function createRoot(children) {
     imports: [],
     cached: 0,
     temps: 0,
-    codegenNode: undefined
-    //loc
+    codegenNode: undefined,
+    //loc,
+    jsNode: null
   }
 }
 
@@ -94,8 +95,6 @@ export function createIdentifier(name) {
 }
 
 export function createCallExpress(callee, args) {
-  console.log(args)
-
   return {
     type: 'CallExpression',
     callee: createIdentifier(callee),

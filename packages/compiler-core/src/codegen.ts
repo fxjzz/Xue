@@ -1,24 +1,16 @@
-import { isString } from '@xue/shared'
-import { NodeTypes } from './ast'
-
 //to create
 //function render(){
 //  return h()
 //}
-export function generate(ast) {
-  const context = createCodegenContext(ast)
-  const { push, indent } = context
-  push(`function renter(_ctx,_cache) {`)
-  indent()
-  push(`return `)
-  if (ast.codegenNode) {
-    genNode(ast.codegenNode, context)
-  }
+export function generate(node) {
+  const context = createCodegenContext()
+
+  genNode(node, context)
 
   return context.code
 }
 
-function createCodegenContext(ast) {
+function createCodegenContext() {
   const context = {
     code: '',
     //缩进级别 (几个空格)
@@ -29,11 +21,17 @@ function createCodegenContext(ast) {
       context.code += code
     },
 
+    //换行+缩进
     indent() {
       newline(++context.indentLevel)
     },
+    //换行
     newline() {
       newline(context.indentLevel)
+    },
+    //换行+退格
+    deIndent() {
+      newline(--context.indentLevel)
     }
   }
 
@@ -45,23 +43,73 @@ function createCodegenContext(ast) {
 }
 
 function genNode(node, context) {
-  if (isString(node)) {
-    context.push(node)
-    return
-  }
-
   switch (node.type) {
-    case NodeTypes.VNODE_CALL:
-      genVNodeCall(node, context)
+    case 'FunctionDecl':
+      genFunctionDecl(node, context)
       break
+    case 'ReturnStatement':
+      genReturnStatement(node, context)
+      break
+    case 'CallExpression':
+      genCallExpression(node, context)
+      break
+    case 'StringLiteral':
+      genStringLiteral(node, context)
+      break
+    case 'ArrayExpression':
+      genArrayExpression(node, context)
   }
 }
 
-function genVNodeCall(node, context) {
-  const { tag, children, props } = node
-  genNodeList([tag, props, children], context)
+function genFunctionDecl(node, context) {
+  const { push, deIndent, indent } = context
+
+  push(`function ${node.id.name}`)
+  push('(')
+  genNodeList(node.params, context)
+  push(') {')
+  indent()
+  node.body.forEach(n => genNode(n, context))
+  deIndent()
+  push('}')
+}
+
+function genReturnStatement(node, context) {
+  const { push } = context
+
+  push('return ')
+  genNode(node.return, context)
+}
+
+function genCallExpression(node, context) {
+  const { push } = context
+  const { args, callee } = node
+  push(`${callee.name}`)
+  push('(')
+
+  genNodeList(args, context)
+  push(')')
+}
+
+function genStringLiteral(node, context) {
+  const { push } = context
+  push(`'${node.value}'`)
+}
+
+function genArrayExpression(node, context) {
+  const { push } = context
+  push('[')
+  genNodeList(node.elements, context)
+  push(']')
 }
 
 function genNodeList(nodes, context) {
-  const { push, newline } = context
+  const { push } = context
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    genNode(node, context)
+    if (i < nodes.length - 1) {
+      push(', ')
+    }
+  }
 }

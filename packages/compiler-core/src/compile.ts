@@ -19,7 +19,7 @@ export function baseCompile(template: string, options = {}) {
       directiveTransforms: extend({})
     })
   )
-  console.log('ast1', ast)
+  const render = generate(ast.jsNode)
 
-  return generate(ast)
+  return render
 }
