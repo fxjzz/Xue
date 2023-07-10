@@ -16,12 +16,14 @@ const enum TagType {
 
 export interface ParserContext {
   source: string
+  mode: TextModes
 }
 
 function createParserContext(content: string): ParserContext {
   //还有偏移量 等等
   //核心就是一个source
   return {
+    mode: TextModes.DATA,
     source: content
   }
 }
@@ -74,6 +76,14 @@ function parseChildren(context: ParserContext, mode: TextModes, ancestors) {
 
 function parseElement(context: ParserContext, ancestors: Array<any>) {
   const element = parseTag(context, TagType.Start)
+
+  if (element.tag === 'textarea' || element.tag === 'title') {
+    context.mode = TextModes.RCDATA
+  } else if (/style|script|xmp|noscript|iframe/.test(element.tag)) {
+    context.mode = TextModes.RAWTEXT
+  } else {
+    context.mode = TextModes.DATA
+  }
 
   ancestors.push(element)
   const children = parseChildren(context, TextModes.DATA, ancestors)
