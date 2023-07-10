@@ -49,6 +49,9 @@ function parseChildren(context: ParserContext, mode: TextModes, ancestors) {
         if (s.length === 1) {
         } else if (s[1] === '!') {
         } else if (s[1] === '/') {
+          //状态机遇到错误 (标签闭合)
+          console.error('错误的闭合标签')
+          continue
         } else if (/[a-z]/i.test(s[1])) {
           node = parseElement(context, ancestors)
         }
@@ -80,6 +83,8 @@ function parseElement(context: ParserContext, ancestors: Array<any>) {
 
   if (startsWithEndTagOpen(context.source, element.tag)) {
     parseTag(context, TagType.End)
+  } else {
+    console.error(`${element.tag} 缺少闭合标签`)
   }
 
   return element
