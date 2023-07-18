@@ -17,15 +17,25 @@ export let activeEffect: ReactiveEffect | undefined
 export class ReactiveEffect<T = any> {
   computed?: ComputedRefImpl<T>
 
+  deps: Dep[] = []
   constructor(
     public fn: () => T,
     public scheduler: EffectScheduler | null = null
   ) {}
   run() {
     activeEffect = this
+    cleanupEffect(this)
     return this.fn()
   }
   stop() {}
+}
+
+function cleanupEffect(effect: ReactiveEffect) {
+  const { deps } = effect
+  for (let i = 0; i < deps.length; i++) {
+    deps[i].delete(effect)
+  }
+  deps.length = 0
 }
 
 export function effect<T = any>(fn: () => T, options?: ReactiveEffectOptions) {
@@ -55,6 +65,7 @@ export function track(target: object, key: unknown) {
 }
 export function trackEffects(dep: Dep, eventInfo?) {
   dep.add(activeEffect!)
+  activeEffect!.deps.push(dep)
 }
 
 export function trigger(target: object, key: unknown, value: unknown) {
@@ -69,6 +80,7 @@ export function trigger(target: object, key: unknown, value: unknown) {
 }
 
 export function triggerEffects(dep: Dep) {
+  //const effects = dep (bug)
   const effects = Array.isArray(dep) ? dep : [...dep]
   for (const effect of effects) {
     if (effect.computed) {

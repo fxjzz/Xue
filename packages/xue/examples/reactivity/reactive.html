@@ -10,20 +10,22 @@
   <body>
     <div id="app">
       <p id="p1"></p>
-      <p id="p2"></p>
     </div>
     <script>
       const { reactive, effect } = Xue
-      const x = reactive({ name: '2' })
+      const x = reactive({ hha:true,name: '2' })
       effect(() => {
-        document.getElementById('p1').innerHTML = x.name
-      })
-      effect(() => {
-        document.getElementById('p2').innerHTML = x.name
+        console.log('do');
+        document.getElementById('p1').innerHTML = x.hha ? x.name : '静态'
       })
       setTimeout(() => {
-        x.name = '222'
+        x.hha = false
       }, 1000)
+
+      //依然触发effectFn
+      setTimeout(()=>{
+        x.name = '123123'
+      },4000)
     </script>
   </body>
 </html>
