@@ -16,6 +16,7 @@ export let activeEffect: ReactiveEffect | undefined
 
 export class ReactiveEffect<T = any> {
   computed?: ComputedRefImpl<T>
+  parent: ReactiveEffect | undefined = undefined
 
   deps: Dep[] = []
   constructor(
@@ -23,9 +24,23 @@ export class ReactiveEffect<T = any> {
     public scheduler: EffectScheduler | null = null
   ) {}
   run() {
-    activeEffect = this
-    cleanupEffect(this)
-    return this.fn()
+    let parent: ReactiveEffect | undefined = activeEffect
+    // while (parent) {
+    //   if (parent === this) {
+    //     return
+    //   }
+    //   parent = parent.parent
+    // }
+
+    try {
+      this.parent = activeEffect
+      activeEffect = this
+      cleanupEffect(this)
+      return this.fn()
+    } finally {
+      activeEffect = this.parent
+      this.parent = undefined
+    }
   }
   stop() {}
 }

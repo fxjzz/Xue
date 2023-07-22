@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../../dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <p id="p1"></p>
+    </div>
+    <script>
+      const { reactive, effect } = Xue
+      const obj = reactive({ x:'x',y:'y',z:'z' })
+      effect(() => {
+        console.log('fn1');
+        effect(()=>{
+          console.log('fn2');
+          obj.x
+        })
+        obj.y
+      })
+      setTimeout(() => {
+        obj.y = '1'
+      }, 5000)
+    </script>
+  </body>
+</html>
