@@ -110,9 +110,11 @@ export function triggerEffects(dep: Dep) {
 }
 
 export function triggerEffect(effect: ReactiveEffect) {
-  if (effect.scheduler) {
-    effect.scheduler()
-  } else {
-    effect.run()
+  if (effect !== activeEffect) {
+    if (effect.scheduler) {
+      effect.scheduler()
+    } else {
+      effect.run()
+    }
   }
 }
